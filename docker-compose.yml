@@ -6,7 +6,7 @@ services:
     ports:
       - "5123:5123"
     volumes:
-      - ./app:/app        # Mount the app directory to the container
+      - .:/app  # Mount the entire current directory to the container's /app
       - registrations-db:/app/instance  # Mount a named volume for the database
     environment:
       - FLASK_APP=app.py
