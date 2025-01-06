@@ -135,6 +135,6 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # Create the tables if they don't exist
         initialize_projects()  # Initialize projects manually
-    app.run(debug=True)
-    # Run the app on all interfaces (0.0.0.0) and on port 5123
+
+    # Explicitly set host and port
     app.run(host="0.0.0.0", port=5123, debug=True)

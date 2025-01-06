@@ -10,6 +10,9 @@ services:
       - registrations-db:/app/instance  # Mount a named volume for the database
     environment:
       - FLASK_APP=app.py
+      - FLASK_RUN_HOST=0.0.0.0  # Set the host to 0.0.0.0 for external access
+      - FLASK_RUN_PORT=5123  # Set the port to 5123
+
     restart: always
 
 volumes:
