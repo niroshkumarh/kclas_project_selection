@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.3/css/jquery.dataTables.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        h1 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        table th, table td {
+            text-align: center;
+        }
+
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+
+        <div class="section-title">Project Student Counts:</div>
+        <ul class="list-group">
+            {% for project, count in project_counts.items() %}
+            <li class="list-group-item">{{ project }}: {{ count }} </li>
+            {% endfor %}
+        </ul>
+
+        <div class="section-title">Registrations:</div>
+
+        <div class="table-responsive">
+            <table id="registrationsTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Time Stamp</th>
+                        <th>Name</th>
+                        <th>Roll Number</th>
+                        <th>Department</th>
+                        <th>Project</th>
+                        <th>Contact</th>
+                        <th>Email</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registration in registrations %}
+                    <tr>
+                        <td>{{ registration.timestamp }}</td>
+                        <td>{{ registration.name }}</td>
+                        <td>{{ registration.roll_number }}</td>
+                        <td>{{ registration.department }}</td>
+                        <td>{{ registration.project }}</td>
+                        <td>{{ registration.contact_number }}</td>
+                        <td>{{ registration.kclas_email }}</td>
+                        <td>{{ registration.reason }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Button to download the CSV -->
+        <a href="{{ url_for('download_csv') }}" class="btn btn-primary mt-4">Download Registrations as CSV</a>
+    </div>
+
+    <!-- jQuery (required for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.3/js/jquery.dataTables.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Initialize DataTable
+        $(document).ready(function() {
+            $('#registrationsTable').DataTable({
+                "paging": true,        // Enable pagination
+                "searching": true,     // Enable search bar
+                "ordering": true,      // Enable sorting of columns
+                "info": true,          // Display info text (Showing X of Y entries)
+                "lengthMenu": [5, 10, 25, 50, 100],  // Set rows per page options
+                "pageLength": 5,       // Default to 5 rows per page
+                "language": {
+                    "search": "Search registrations:", // Search label
+                    "paginate": {
+                        "previous": "Previous",
+                        "next": "Next"
+                    },
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries"
+                }
+            });
+
+            // Attach the click event for CSV download button
+            $('#downloadCSVBtn').on('click', function() {
+                // Make the AJAX request to backend to get the CSV
+                $.ajax({
+                    url: window.location.href, // This will send a request to the current page URL
+                    type: 'GET',
+                    data: {
+                        action: 'download_csv'  // You can add any necessary params here to identify the request
+                    },
+                    success: function(response) {
+                        // Create a Blob from the CSV data received from backend
+                        const blob = new Blob([response], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement('a');
+                        if (link.download !== undefined) {
+                            const url = URL.createObjectURL(blob);
+                            link.setAttribute('href', url);
+                            link.setAttribute('download', 'registrations.csv');  // Name the CSV file
+                            link.style.visibility = 'hidden';
+                            document.body.appendChild(link);
+                            link.click();  // Trigger the download
+                            document.body.removeChild(link);
+                        }
+                    },
+                    error: function() {
+                        alert('Error downloading CSV');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

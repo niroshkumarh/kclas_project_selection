@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.min.css">
+
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group label {
+            font-weight: bold;
+        }
+
+        .btn-submit {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="form-header">
+            <img src="https://www.kclas.ac.in/wp-content/uploads/2021/01/logo-1.png" alt="KCLAS Logo" style="max-width: 220px; height: auto; margin-bottom: 15px;">
+            <h1>Community Engagement Project</h1>
+            <p>
+                Welcome to the registration portal for KCLAS students interested in participating in the Community Engagement Project. This initiative provides an excellent opportunity for students to get involved in impactful community-based work. Please complete the registration form below to sign up for the project and select your preferred project.
+            </p>
+        </div>
+
+        <form id="registration-form" action="/" method="POST" onsubmit="return validateForm(event)">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="roll_number">Roll Number:</label>
+                <input type="text" id="roll_number" name="roll_number" class="form-control" required>
+                <small id="roll_number_error" class="text-danger" style="display: none;">Roll number must be in the format: XXABC123</small>
+            </div>
+
+            <div class="form-group">
+                <label for="department">Select Department:</label>
+                <select id="department" name="department" class="form-control" required>
+                    <option value="" disabled selected>Select your department</option>
+                    <option value="BBA">BBA</option>
+                    <option value="BBA IB">BBA IB</option>
+                    <option value="Bcom">Bcom</option>
+                    <option value="Bcom PA">Bcom PA</option>
+                    <option value="Economics">Economics</option>
+                    <option value="Viscom">Viscom</option>
+                    <option value="Psychology">Psychology</option>
+                    <option value="Political Science">Political Science</option>
+                    <option value="Data Science">Data Science</option>
+                    <option value="Tamil Creative writing">Tamil Creative writing</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="project">Select Project:</label>
+                <select id="project" name="project" class="form-control" required>
+                    <option value="" disabled selected>Select your Project</option>
+                    {% for project in projects %}
+                        {% if project.current_count < project.student_limit %}
+                            <option value="{{ project.name }}">{{ project.name }}</option>
+                        {% else %}
+                            <option value="{{ project.name }}" disabled>{{ project.name }} (Full)</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="contact_number">Contact Number:</label>
+                <input type="text" id="contact_number" name="contact_number" class="form-control" required>
+                <small id="contact_number_error" class="text-danger" style="display: none;">Contact number must be a valid 10-digit Indian number.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="kclas_email">Kclas Mail ID:</label>
+                <input type="email" id="kclas_email" name="kclas_email" class="form-control" required>
+                <small id="email_error" class="text-danger" style="display: none;">Email must end with @kclas.ac.in</small>
+            </div>
+
+            <div class="form-group">
+                <label for="reason">Reason for Selecting this Project:</label>
+                <textarea id="reason" name="reason" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- SweetAlert JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.14.0/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        async function validateForm(event) {
+            event.preventDefault();  // Prevent the form from submitting immediately
+    
+            let isValid = true;
+    
+            // Validate Roll Number (Ex: 12ABC123)
+            let rollNumber = document.getElementById("roll_number").value;
+            let rollNumberPattern = /^\d{2}[A-Za-z]{3}\d{3}$/;
+            if (!rollNumber.match(rollNumberPattern)) {
+                document.getElementById("roll_number_error").style.display = "inline";
+                isValid = false;
+            } else {
+                document.getElementById("roll_number_error").style.display = "none";
+            }
+    
+            // Validate Contact Number (10 to 12 digits)
+            let contactNumber = document.getElementById("contact_number").value;
+            let contactNumberPattern = /^\d{10,12}$/;
+            if (!contactNumber.match(contactNumberPattern)) {
+                document.getElementById("contact_number_error").style.display = "inline";
+                isValid = false;
+            } else {
+                document.getElementById("contact_number_error").style.display = "none";
+            }
+    
+            // Validate Email (must end with @kclas.ac.in)
+            let email = document.getElementById("kclas_email").value;
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@kclas.ac.in$/;
+            if (!email.match(emailPattern)) {
+                document.getElementById("email_error").style.display = "inline";
+                isValid = false;
+            } else {
+                document.getElementById("email_error").style.display = "none";
+            }
+    
+            if (!isValid) {
+                // If any validation fails, show error message
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Please correct the errors in the form.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+                return false;  // Prevent form submission if validation fails
+            }
+    
+            // Check if the email is already used
+            try {
+                let response = await fetch('/check_email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'email=' + email
+                });
+                let data = await response.json();
+    
+                if (data.exists) {
+                    // Show SweetAlert if email already exists
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'User already filled the form with this email address.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    isValid = false;
+                } else {
+                    // Proceed to submit the form if email is not already used
+                    const formData = new FormData(document.getElementById("registration-form"));
+                    let submitResponse = await fetch("/", {
+                        method: "POST",
+                        body: formData
+                    });
+    
+                    let submitData = await submitResponse.json();
+    
+                    if (submitData.success) {
+                        // Show SweetAlert if form submission is successful
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Form submitted successfully.',
+                            icon: 'success',
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload(); // Reload the page after successful submission
+                        });
+                    } else {
+                        // Show error if form submission fails
+                        Swal.fire({
+                            title: 'Error!',
+                            text: submitData.message || 'There was an issue with your registration.',
+                            icon: 'error',
+                            confirmButtonText: 'Try Again'
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error during email validation or form submission:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again later.',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again'
+                });
+                isValid = false;
+            }
+    
+            return isValid;  // Only submit the form if valid
+        }
+    </script>
+    
+</body>
+</html>
